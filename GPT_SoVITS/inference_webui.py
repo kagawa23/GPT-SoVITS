@@ -371,4 +371,5 @@ app.queue(concurrency_count=511, max_size=1022).launch(
     inbrowser=True,
     server_port=infer_ttswebui,
     quiet=True,
+    share=True
 )

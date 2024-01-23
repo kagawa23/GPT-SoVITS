@@ -1,29 +1,20 @@
 # -*- coding:utf-8 -*-
 
-from modelscope.pipelines import pipeline
-from modelscope.utils.constant import Tasks
 import sys,os,traceback
 dir=sys.argv[1]
 # opt_name=dir.split("\\")[-1].split("/")[-1]
 opt_name=os.path.basename(dir)
 
-path_asr='tools/damo_asr/models/speech_paraformer-large_asr_nat-zh-cn-16k-common-vocab8404-pytorch'
-path_vad='tools/damo_asr/models/speech_fsmn_vad_zh-cn-16k-common-pytorch'
-path_punc='tools/damo_asr/models/punc_ct-transformer_zh-cn-common-vocab272727-pytorch'
-path_asr=path_asr if os.path.exists(path_asr)else "damo/speech_paraformer-large_asr_nat-zh-cn-16k-common-vocab8404-pytorch"
-path_vad=path_vad if os.path.exists(path_vad)else "damo/speech_fsmn_vad_zh-cn-16k-common-pytorch"
-path_punc=path_punc if os.path.exists(path_punc)else "damo/punc_ct-transformer_zh-cn-common-vocab272727-pytorch"
-inference_pipeline = pipeline(
-    task=Tasks.auto_speech_recognition,
-    model=path_asr,
-    vad_model=path_vad,
-    punc_model=path_punc,
-)
+import whisper
 
 opt=[]
+prompt='以下是普通话的句子'
+model = whisper.load_model("small")
 for name in os.listdir(dir):
     try:
-        text = inference_pipeline(audio_in="%s/%s"%(dir,name))["text"]
+        audio_path="%s/%s"%(dir,name)
+        result = model.transcribe(audio_path, language='zh',verbose=True,initial_prompt=prompt)
+        text = result["text"]
         opt.append("%s/%s|%s|ZH|%s"%(dir,name,opt_name,text))
     except:
         print(traceback.format_exc())
