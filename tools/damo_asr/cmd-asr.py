@@ -8,14 +8,15 @@ opt_name=os.path.basename(dir)
 import whisper
 
 opt=[]
-prompt='以下是普通话的句子'
+prompt=''
 model = whisper.load_model("small")
 for name in os.listdir(dir):
     try:
         audio_path="%s/%s"%(dir,name)
-        result = model.transcribe(audio_path, language='zh',verbose=True,initial_prompt=prompt)
+        result = model.transcribe(audio_path,verbose=True,initial_prompt=prompt)
         text = result["text"]
-        opt.append("%s/%s|%s|ZH|%s"%(dir,name,opt_name,text))
+        language = result['language']
+        opt.append("%s/%s|%s|%s|%s"%(dir,name,opt_name,language,text))
     except:
         print(traceback.format_exc())
 
